@@ -241,3 +241,58 @@ To replicate this project:
 All experiments in the paper were generated using these steps and this environment.
 
 ---
+
+---
+
+## ⚙️ Executing the Application
+
+The `legacy_app` binary now runs a finite loop of sensor/control cycles for consistent and automated testing.
+
+### ✅ Default Behavior
+
+```bash
+./build/legacy_app
+```
+
+- Runs **1000** iterations of sensor reading and control updating.
+
+### 🧮 Custom Iterations
+
+You can pass the number of iterations as a command-line argument:
+
+```bash
+./build/legacy_app 5000   # Runs 5000 iterations
+```
+
+This allows tuning the workload for deeper profiling or quicker test runs.
+
+---
+
+## 🔧 VSCode Clangd + Formatting Support
+
+For optimal VSCode integration with C/C++ tooling:
+
+1. **Install the [Clangd Language Server](https://clangd.llvm.org/installation.html)**
+
+    ```bash
+    sudo apt install clangd
+    ```
+
+2. **Install These VSCode Extensions**:
+    - [Clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd)
+    - [Clang-Format](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format)
+
+3. **Optional VSCode Settings** (`.vscode/settings.json`):
+
+    ```json
+    {
+      "C_Cpp.clang_format_path": "/usr/bin/clang-format",
+      "clangd.path": "/usr/bin/clangd",
+      "editor.formatOnSave": true,
+      "files.eol": "\n"
+    }
+    ```
+
+These tools ensure code follows the same linting and formatting guidelines used in automation.
+
+---

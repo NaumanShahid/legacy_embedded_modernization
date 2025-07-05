@@ -3,6 +3,7 @@
 /CMakeFiles/
 /cmake-build-*/
 
+# CMake cache and install files
 /CMakeCache.txt
 cmake_install.cmake
 CTestTestfile.cmake
@@ -22,6 +23,13 @@ Makefile.in
 # === Test artifacts ===
 test_detail.xml
 *.log
+
+# === Coverage and profiling outputs ===
+coverage-report/
+coverage.info
+gmon.out
+gprof-report.txt
+valgrind-report.txt
 
 # === clang tools ===
 clang-tidy-result.yaml
