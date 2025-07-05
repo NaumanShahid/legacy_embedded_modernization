@@ -1,6 +1,6 @@
-# legacy\_embedded\_modernization
+# legacy_embedded_modernization
 
-**Legacy Project Safe Modernization and Virtualized Testing of Legacy Embedded C Codebases**
+**Legacy Project: Safe Modernization and Virtualized Testing of Legacy Embedded C Codebases**
 
 ---
 
@@ -19,21 +19,15 @@ This project has been tested and verified in the following environment:
     git config --global core.eol lf
     ```
 
-However, this project is designed to work on **any modern Linux distribution**, including:
-
-- Ubuntu (20.04+, recommended)
-- Debian
-- Arch Linux
-- Fedora
-- Native installations or other environments such as Docker or CI pipelines
+> ✅ This project is also compatible with native Linux (Ubuntu, Debian, Arch, Fedora, etc.) or inside containers (e.g., Docker).
 
 ---
 
 ## 📦 Required Tools and Dependencies
 
-Install the following tools and dependencies using your distro's package manager:
+Install the following packages:
 
-### 🔧 System Packages (Debian/Ubuntu-based)
+### Debian/Ubuntu:
 
 ```bash
 sudo apt update
@@ -53,21 +47,21 @@ sudo apt install -y \
   util-linux-extra  # Required for hwclock (especially in WSL)
 ```
 
-> For other distros (e.g., Fedora, Arch), use the equivalent packages via `dnf` or `pacman`.
+> 🔧 On other distros, use equivalent packages via `dnf`, `pacman`, etc.
 
 ---
 
-### 🧪 GoogleTest Dependency (Submodule)
+## 🧪 GoogleTest Dependency (Submodule)
 
-This project uses [GoogleTest](https://github.com/google/googletest) as a Git submodule.
+This project uses [GoogleTest](https://github.com/google/googletest) as a submodule.
 
-After cloning the repository, run:
+If you've already cloned the repo:
 
 ```bash
 git submodule update --init --recursive
 ```
 
-If cloning for the first time:
+Or when cloning for the first time:
 
 ```bash
 git clone --recurse-submodules <repo-url>
@@ -75,49 +69,48 @@ git clone --recurse-submodules <repo-url>
 
 ---
 
-## 📁 Project Structure Overview
+## 📁 Project Structure
 
 ```
 legacy_embedded_modernization/
-├── src/                    # Legacy embedded codebase (.c/.cpp/.h)
-├── tests/                 # GoogleTest-based unit tests
+├── src/                    # Legacy embedded code (.c/.cpp/.h)
+├── tests/                 # GoogleTest unit tests
 ├── third_party/
-│   └── googletest/        # Added as a git submodule
+│   └── googletest/        # Git submodule
 ├── build/                 # CMake build output (gitignored)
 ├── .clang-format          # Code style config
 ├── .clang-tidy            # Linting config
 ├── Makefile               # Optional make wrapper
-├── CMakeLists.txt         # CMake build logic
-└── README.md
+├── CMakeLists.txt         # Build logic
+├── fix_clock_skew.sh      # Optional: Clock skew fixer
+└── README.md              # This file
 ```
 
 ---
 
 ## ⚙️ Build Instructions
 
-In a Linux terminal, from the project root:
-
-### Option A: Using CMake directly
+### Option A: Using CMake
 
 ```bash
 cmake -B build
 cmake --build build
-./build/legacy_app      # Run the application
+./build/legacy_app
 ```
 
-### Option B: Using the provided Makefile
+### Option B: Using Make
 
 ```bash
-make         # Builds the project
-make run     # Runs the built application
-make tidy    # Runs clang-tidy checks
-make test    # Runs unit tests
-make clean   # Cleans the build
+make         # Build the project
+make run     # Run the binary
+make tidy    # Run clang-tidy checks
+make test    # Run unit tests
+make clean   # Clean build
 ```
 
 ---
 
-## 🥪 Running Tests
+## 🧪 Running Unit Tests
 
 ```bash
 cd build
@@ -134,13 +127,13 @@ make test
 
 ## 🧼 Linting & Formatting
 
-Run lint checks:
+Run lint:
 
 ```bash
 make tidy
 ```
 
-Run code formatting manually:
+Format code manually:
 
 ```bash
 clang-format -i src/*.cpp src/*.h
@@ -148,9 +141,9 @@ clang-format -i src/*.cpp src/*.h
 
 ---
 
-## 📊 Coverage & Profiling Tools
+## 📊 Code Coverage & Profiling
 
-These are used during **Phase 4** of the paper:
+Used in **Phase 4** of the research.
 
 ### Code Coverage (gcov + lcov)
 
@@ -162,9 +155,9 @@ lcov --capture --directory build --output-file coverage.info
 genhtml coverage.info --output-directory coverage-report
 ```
 
-Then open `coverage-report/index.html` in a browser.
+Open `coverage-report/index.html` in a browser.
 
-### Valgrind (memory errors)
+### Valgrind (memory leak checks)
 
 ```bash
 valgrind --leak-check=full ./build/legacy_app
@@ -189,39 +182,40 @@ If you see build warnings like:
 gmake: Warning: File 'Makefile' has modification time in the future
 ```
 
-It's due to **clock skew** — your file timestamps appear ahead of system time.
+It’s caused by **clock skew** — timestamps are ahead of system time.
 
-### ✅ Fix Options:
+### ✅ How to Fix
 
-- **WSL fix**: sync system time with:
+1. Sync your system time:
 
-  > Make sure `hwclock` is available by installing `util-linux-extra` first:
+   ```bash
+   sudo apt install util-linux-extra      # If not already installed
+   sudo hwclock -s
+   ```
 
-  ```bash
-  sudo apt install util-linux-extra
-  sudo hwclock -s
-  ```
+2. Run the helper script to touch all files:
 
-- **Touch files** to reset timestamps:
+   ```bash
+   ./fix_clock_skew.sh
+   ```
 
-  ```bash
-  find . -type f -exec touch {} +
-  ```
+   (If not present, run manually: `find . -type f -exec touch {} +`)
 
-- **Use native WSL directory** instead of `/mnt/e/...` to avoid NTFS timestamp quirks.
+3. Rebuild your project:
 
-- **Force full rebuild**:
+   ```bash
+   make clean && make
+   ```
 
-  ```bash
-  make -B
-  ```
+4. Avoid working inside `/mnt/c/...` or other NTFS mount paths in WSL for best file system consistency.
 
 ---
 
-## 💡 Tips for VSCode Integration (Optional)
+## 💡 VSCode Integration (Optional)
 
-- Install the [WSL Extension for VSCode](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl)
-- Add a `.vscode/settings.json` file:
+Install the [WSL Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) for VSCode.
+
+Example `.vscode/settings.json`:
 
 ```json
 {
@@ -233,16 +227,17 @@ It's due to **clock skew** — your file timestamps appear ahead of system time.
 
 ---
 
-## 🧪 Ensuring Reproducibility
+## 📌 Reproducibility Summary
 
-Before attempting to replicate the results from the paper:
+To replicate this project:
 
-- Use a modern Linux environment (WSL or native Ubuntu recommended)
-- Install all dependencies as described
-- Clone the repo with `--recurse-submodules`
-- Use `cmake`, `make`, `ctest`, `valgrind`, and `lcov` as shown
+- Use any modern Linux system (Ubuntu recommended)
+- Clone with submodules
+- Install dependencies
+- Run: `cmake -B build && cmake --build build`
+- Run: `make tidy`, `make test`, `valgrind`, `lcov`, `gprof`
+- If on WSL, run `sudo hwclock -s && ./fix_clock_skew.sh` to prevent build errors
 
-All static analysis, testing, and profiling results are generated in the paper using the exact setup above.
+All experiments in the paper were generated using these steps and this environment.
 
 ---
-
