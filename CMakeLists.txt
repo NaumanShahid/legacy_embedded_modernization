@@ -23,3 +23,18 @@ add_executable(legacy_app ${SOURCES})
 
 # Installation (optional)
 install(TARGETS legacy_app DESTINATION bin)
+
+# === GoogleTest ===
+add_subdirectory(third_party/googletest)
+enable_testing()
+
+include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+
+add_executable(unit_tests
+    tests/test_sensor.cpp
+    sensor.cpp
+)
+
+target_link_libraries(unit_tests gtest gtest_main)
+
+add_test(NAME SensorTests COMMAND unit_tests)
